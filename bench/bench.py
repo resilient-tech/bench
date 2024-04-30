@@ -277,7 +277,7 @@ class BenchApps(MutableSequence):
 			with open(self.bench.apps_txt) as f:
 				self.apps = [
 					app.strip()
-					for app in f.read().split("\n")
+					for app in f.read().splitlines()
 					if len(app) > 0 and is_frappe_app(os.path.join(self.bench.name, "apps", app))
 				]
 
