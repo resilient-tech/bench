@@ -889,6 +889,9 @@ def install_app(
 	if resolution == UNSET_ARG:
 		resolution = []
 
+	# REMOVE : debug logs
+	click.secho("\n--- `install app` function Called ---\n",fg="yellow",bold=True)
+
 	bench = Bench(bench_path)
 	conf = bench.conf
 
@@ -897,6 +900,9 @@ def install_app(
 	cache_flag = "--no-cache-dir" if no_cache else ""
 
 	app_path = os.path.realpath(os.path.join(bench_path, "apps", app))
+
+	# REMOVE : debug logs
+	click.secho(f"\n--- path : {app_path} ---\n",fg="yellow",bold=True)
 
 	bench.run(
 		f"{bench.python} -m pip install {quiet_flag} --upgrade -e {app_path} {cache_flag}"
@@ -910,6 +916,9 @@ def install_app(
 		if verbose:
 			yarn_install += " --verbose"
 		bench.run(yarn_install, cwd=app_path)
+
+	# REMOVE : debug logs
+	click.secho(f"\n--- before sync ---\n",fg="yellow",bold=True)
 
 	bench.apps.sync(app_name=app, required=resolution, branch=tag, app_dir=app_path)
 

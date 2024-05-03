@@ -224,7 +224,13 @@ def setup_requirements(node=False, python=False, dev=False, apps=None):
 	"""
 	from bench.bench import Bench
 
+	# REMOVE : debug logs
+	click.secho("\n--- `setup requirements` Command Called ---\n",fg="yellow",bold=True)
+
 	bench = Bench(".")
+
+	click.secho("\n--- `setup requirements` Command Called : After Bench() ---\n",fg="yellow",bold=True)
+
 
 	if not (node or python or dev):
 		bench.setup.requirements(apps=apps)
@@ -237,6 +243,7 @@ def setup_requirements(node=False, python=False, dev=False, apps=None):
 
 	else:
 		from bench.utils.bench import install_python_dev_dependencies
+		click.secho("\n--- `setup requirements` Command Called : else condition for dev_dependency ---\n",fg="yellow",bold=True)
 
 		install_python_dev_dependencies(apps=apps)
 

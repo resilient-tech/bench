@@ -200,9 +200,16 @@ def get_app(
 )
 @click.argument("app-name")
 def new_app(app_name, no_git=None):
+	click.secho("\n--- `new_app` function Called before import ---\n",fg="yellow",bold=True)
+
 	from bench.app import new_app
+	# REMOVE : debug logs
+	click.secho("\n--- `new_app` function Called after import ---\n",fg="yellow",bold=True)
 
 	new_app(app_name, no_git)
+
+	click.secho("\n--- `new_app` function ENDS ---\n",fg="yellow",bold=True)
+
 
 
 @click.command(
