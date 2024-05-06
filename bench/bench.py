@@ -61,7 +61,7 @@ class Validator:
 class Bench(Base, Validator):
 	def __init__(self, path):
 		# REMOVE : debug logs
-		click.secho(f"\n--- Bench __init__ called ---\n",fg="blue",bold=True)
+		click.secho(f"\n--- Bench __init__ called ---\n", fg="blue", bold=True)
 		self.name = path
 		self.cwd = os.path.abspath(path)
 		self.exists = is_bench_directory(self.name)
@@ -159,13 +159,17 @@ class Bench(Base, Validator):
 
 	def get_installed_apps(self) -> List:
 		"""Returns list of installed apps on bench, not in excluded_apps.txt"""
-		click.secho("\n--- `get_installed_apps` method Called ---\n",fg="yellow",bold=True)
+		click.secho("\n--- `get_installed_apps` method Called ---\n", fg="yellow", bold=True)
 
 		try:
 			installed_packages = get_cmd_output(f"{self.python} -m pip freeze", cwd=self.name)
 		except Exception:
 			installed_packages = []
-		click.secho(f"\n--- `get_installed_apps` method Called installed_packages : {installed_packages}  ---\n",fg="yellow",bold=True)
+		click.secho(
+			f"\n--- `get_installed_apps` method Called installed_packages : {installed_packages}  ---\n",
+			fg="yellow",
+			bold=True,
+		)
 		return [
 			app
 			for app in self.apps
@@ -176,7 +180,7 @@ class Bench(Base, Validator):
 class BenchApps(MutableSequence):
 	def __init__(self, bench: Bench):
 		# REMOVE : debug logs
-		click.secho(f"\n--- BenchApps __init__ called ---\n",fg="blue",bold=True)	
+		click.secho(f"\n--- BenchApps __init__ called ---\n", fg="blue", bold=True)
 		self.bench = bench
 		self.states_path = os.path.join(self.bench.name, "sites", "apps.json")
 		self.apps_path = os.path.join(self.bench.name, "apps")
@@ -185,12 +189,12 @@ class BenchApps(MutableSequence):
 
 	def set_states(self):
 		# REMOVE : debug logs
-		click.secho(f"\n--- set_states method called ---\n",fg="yellow",bold=True)	
+		click.secho(f"\n--- set_states method called ---\n", fg="yellow", bold=True)
 		try:
 			with open(self.states_path) as f:
 				self.states = json.loads(f.read() or "{}")
-			click.secho(f"\n--- self.states : {self.states} ---\n",fg="green",bold=True)	
-			
+			click.secho(f"\n--- self.states : {self.states} ---\n", fg="green", bold=True)
+
 		except FileNotFoundError:
 			self.states = {}
 
@@ -201,25 +205,33 @@ class BenchApps(MutableSequence):
 		branch: Union[str, None] = None,
 		required: List = UNSET_ARG,
 	):
+		click.secho(f"\n--- update_apps_states method called ---\n", fg="yellow", bold=True)
+		click.secho(f"\n--- apps_dir : {app_dir} ---\n", fg="blue", bold=True)
+		click.secho(f"\n--- app_name : {app_name} ---\n", fg="blue", bold=True)
+		click.secho(f"\n--- branch : {branch} ---\n", fg="blue", bold=True)
+		click.secho(f"\n--- required : {required} ---\n", fg="blue", bold=True)
+
 		if required == UNSET_ARG:
 			required = []
 
 		# REMOVE : debug logs
-		click.secho(f"\n--- update_apps_states method called ---\n",fg="yellow",bold=True)		
-		click.secho(f"\n--- self.apps : {self.apps} ---\n",fg="green",bold=True)
-		click.secho(f"\n--- self.states_path : {self.states_path} ---\n",fg="green",bold=True)
-		click.secho(f"\n--- exist? : {os.path.exists(self.states_path)} ---\n",fg="green",bold=True)
-
+		click.secho(f"\n--- self.apps : {self.apps} ---\n", fg="green", bold=True)
+		click.secho(
+			f"\n--- self.states_path : {self.states_path} ---\n", fg="green", bold=True
+		)
+		click.secho(
+			f"\n--- exist? : {os.path.exists(self.states_path)} ---\n", fg="green", bold=True
+		)
 
 		if self.apps and not os.path.exists(self.states_path):
-			click.secho(f"\n--- I am in if ? : True ---\n",fg="blue",bold=True)
+			click.secho(f"\n--- I am in if ? : True ---\n", fg="blue", bold=True)
 
 			# idx according to apps listed in apps.txt (backwards compatibility)
 			# Keeping frappe as the first app.
 			if "frappe" in self.apps:
 				self.apps.remove("frappe")
 				self.apps.insert(0, "frappe")
-				with open(self.bench.apps_txt, "w") as f: #NOTE : here changes in apps.txt
+				with open(self.bench.apps_txt, "w") as f:  # NOTE : here changes in apps.txt
 					f.write("\n".join(self.apps))
 
 			print("Found existing apps updating states...")
@@ -232,10 +244,10 @@ class BenchApps(MutableSequence):
 				}
 
 		apps_to_remove = []
-		#REMOVE
-		click.secho(f"\n--- self.states? : {self.states} ---\n",fg="green",bold=True)
-		click.secho(f"\n--- self.apps? : {self.apps} ---\n",fg="green",bold=True)
-		# FIXME : can make this code more efficient 
+		# REMOVE
+		click.secho(f"\n---BEFORE self.states? : {self.states} ---\n", fg="green", bold=True)
+		click.secho(f"\n--- self.apps? : {self.apps} ---\n", fg="green", bold=True)
+		# FIXME : can make this code more efficient
 		for app in self.states:
 			if app not in self.apps:
 				apps_to_remove.append(app)
@@ -247,7 +259,7 @@ class BenchApps(MutableSequence):
 			app_dir = app_name
 
 		if app_name and app_name not in self.states:
-			click.secho(f"\n--- update_apps_state_condition ---\n",fg="yellow",bold=True)
+			click.secho(f"\n--- update_apps_state_condition ---\n", fg="yellow", bold=True)
 
 			version = get_current_version(app_name, self.bench.name)
 
@@ -279,11 +291,13 @@ class BenchApps(MutableSequence):
 				"version": version,
 			}
 
-		with open(self.states_path, "w") as f:
+		click.secho(f"\n---AFTER self.states? : {self.states} ---\n", fg="green", bold=True)
+
+		with open(self.states_path, "w") as f:  # NOTE: here new app added in apps.json!
 			f.write(json.dumps(self.states, indent=4))
 
-		#REMOVE
-		click.secho(f"\n--- update_apps_state() completed ---\n",fg="blue",bold=True)
+		# REMOVE
+		click.secho(f"\n--- update_apps_state() completed ---\n", fg="blue", bold=True)
 
 	def sync(
 		self,
@@ -293,17 +307,17 @@ class BenchApps(MutableSequence):
 		required: List = UNSET_ARG,
 	):
 		# REMOVE : debug logs
-		click.secho(f"\n--- sync method called ---\n",fg="yellow",bold=True)		
-		click.secho(f"\n--- app_name : {app_name} ---\n",fg="green",bold=True)
-		click.secho(f"\n--- app_dir : {app_dir} ---\n",fg="green",bold=True)
-		click.secho(f"\n--- branch : {branch} ---\n",fg="green",bold=True)
-		click.secho(f"\n--- required : {required} ---\n",fg="green",bold=True)
+		click.secho(f"\n--- sync method called ---\n", fg="yellow", bold=True)
+		click.secho(f"\n--- app_name : {app_name} ---\n", fg="green", bold=True)
+		click.secho(f"\n--- app_dir : {app_dir} ---\n", fg="green", bold=True)
+		click.secho(f"\n--- branch : {branch} ---\n", fg="green", bold=True)
+		click.secho(f"\n--- required : {required} ---\n", fg="green", bold=True)
 
 		if required == UNSET_ARG:
 			required = []
 		self.initialize_apps()
 
-		# FIXME: here is problem if new-app is created then that app details not stored in apps.txt 
+		# FIXME: here is problem if new-app is created then that app details not stored in apps.txt
 		with open(self.bench.apps_txt, "w") as f:
 			f.write("\n".join(self.apps))
 
@@ -312,6 +326,7 @@ class BenchApps(MutableSequence):
 		)
 
 	def initialize_apps(self):
+		click.secho(f"\n--- initialize_apps method called ---\n", fg="yellow", bold=True)
 		try:
 			with open(self.bench.apps_txt) as f:
 				self.apps = [
@@ -353,7 +368,7 @@ class BenchApps(MutableSequence):
 		app.get()
 		app.install()
 		super().append(app.app_name)
-		self.apps.sort()
+		self.apps.sort()  # NOTE: here sorting is done
 
 	def remove(self, app: "App", no_backup: bool = False):
 		app.uninstall()
@@ -373,7 +388,7 @@ class BenchApps(MutableSequence):
 class BenchSetup(Base):
 	def __init__(self, bench: Bench):
 		# REMOVE : debug logs
-		click.secho(f"\n--- BenchSetup __init__ called ---\n",fg="blue",bold=True)	
+		click.secho(f"\n--- BenchSetup __init__ called ---\n", fg="blue", bold=True)
 		self.bench = bench
 		self.cwd = self.bench.cwd
 
@@ -497,6 +512,8 @@ class BenchSetup(Base):
 		"""Install and upgrade specified / all installed apps on given Bench"""
 		from bench.app import App
 
+		click.secho("\n--- bench > requirements called.. ---\n", fg="blue", bold=True)
+
 		apps = apps or self.bench.apps
 
 		self.pip()
@@ -534,7 +551,7 @@ class BenchSetup(Base):
 class BenchTearDown:
 	def __init__(self, bench):
 		# REMOVE : debug logs
-		click.secho(f"\n--- BenchTearDown __init__ called ---\n",fg="blue",bold=True)
+		click.secho(f"\n--- BenchTearDown __init__ called ---\n", fg="blue", bold=True)
 		self.bench = bench
 
 	def backups(self):

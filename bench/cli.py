@@ -63,7 +63,9 @@ def execute_cmd(check_for_update=True, command: str = None, logger: Logger = Non
 
 
 def cli():
-	click.secho("\n--- `cli` function Called : cli in bench>cli ---\n",fg="blue",bold=True)
+	click.secho(
+		"\n--- `cli` function Called : cli in bench>cli ---\n", fg="blue", bold=True
+	)
 
 	setup_clear_cache()
 	global from_command_line, bench_config, is_envvar_warn_set, verbose
@@ -128,10 +130,14 @@ def cli():
 	# handle usages like `--use-feature='feat-x'` and `--use-feature 'feat-x'`
 	if cmd_from_sys and cmd_from_sys.split("=", 1)[0].strip() in opts:
 		bench_command()
-	
-	click.secho("\n--- `I am before error generation` ---\n",fg="blue",bold=True)
-	click.secho(f"\n--- `cmd_from_sys` : {cmd_from_sys}---\n",fg="green",bold=True)
-	click.secho(f"\n--- `bench_command.commands` : {bench_command.commands}---\n",fg="green",bold=True)
+
+	click.secho("\n--- `I am before error generation` ---\n", fg="blue", bold=True)
+	click.secho(f"\n--- `cmd_from_sys` : {cmd_from_sys}---\n", fg="green", bold=True)
+	click.secho(
+		f"\n--- `bench_command.commands` : {bench_command.commands}---\n",
+		fg="green",
+		bold=True,
+	)
 
 	if cmd_from_sys in bench_command.commands:
 		with execute_cmd(check_for_update=is_cli_command, command=command, logger=logger):
@@ -140,6 +146,7 @@ def cli():
 	if in_bench:
 		frappe_cmd()
 
+	# DOUBT : how it is working ?
 	bench_command()
 
 
@@ -238,7 +245,11 @@ def change_working_directory():
 
 
 def setup_clear_cache():
-	click.secho("\n--- `setup_clear_cache` function Called : cli in bench>cli ---\n",fg="blue",bold=True)
+	click.secho(
+		"\n--- `setup_clear_cache` function Called : cli in bench>cli ---\n",
+		fg="blue",
+		bold=True,
+	)
 
 	from copy import copy
 

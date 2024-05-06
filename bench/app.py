@@ -421,6 +421,13 @@ class App(AppMeta):
 			remove_unused_node_modules(app_path)
 
 
+def add_to_appstxt(installed_apps, app, bench_path="."):
+	if app not in installed_apps:
+		installed_apps.append(app)
+		with open(os.path.join(bench_path, "sites", "apps.txt"), "w") as f:
+			f.write("\n".join(installed_apps))
+
+
 def coerce_url_to_name_if_possible(git_url: str, cache_key: str) -> str:
 	app_name = os.path.basename(git_url)
 	if can_get_cached(app_name, cache_key):
@@ -890,9 +897,11 @@ def install_app(
 		resolution = []
 
 	# REMOVE : debug logs
-	click.secho("\n--- `install app` function Called ---\n",fg="yellow",bold=True)
+	click.secho("\n--- `install app` function Called ---\n", fg="yellow", bold=True)
 
-	bench = Bench(bench_path)
+	bench = Bench(
+		bench_path
+	)  # DOUBT : why __init__'s last 3 object initialization not happen?
 	conf = bench.conf
 
 	verbose = bench_cli.verbose or verbose
@@ -902,7 +911,7 @@ def install_app(
 	app_path = os.path.realpath(os.path.join(bench_path, "apps", app))
 
 	# REMOVE : debug logs
-	click.secho(f"\n--- path : {app_path} ---\n",fg="yellow",bold=True)
+	click.secho(f"\n--- path : {app_path} ---\n", fg="yellow", bold=True)
 
 	bench.run(
 		f"{bench.python} -m pip install {quiet_flag} --upgrade -e {app_path} {cache_flag}"
@@ -918,11 +927,19 @@ def install_app(
 		bench.run(yarn_install, cwd=app_path)
 
 	# REMOVE : debug logs
-	click.secho(f"\n--- before sync ---\n",fg="yellow",bold=True)
+	click.secho(f"\n--- before sync ---\n", fg="yellow", bold=True)
+
+	# TODO: here add logic for add new app in Apps.txt
+	add_to_appstxt(installed_apps=bench.apps.apps, app=app, bench_path=bench_path)
+
+	click.secho(
+		f"\n ---------- bench.apps.apps : {bench.apps.apps}  ----------", fg="blue", bold=True
+	)
 
 	bench.apps.sync(app_name=app, required=resolution, branch=tag, app_dir=app_path)
 
 	if not skip_assets:
+		click.secho(f"\n--- calling build assets ....---\n", fg="blue", bold=True)
 		build_assets(bench_path=bench_path, app=app, using_cached=using_cached)
 
 	if restart_bench:

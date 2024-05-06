@@ -78,7 +78,9 @@ def update_node_packages(bench_path=".", apps=None, verbose=None):
 
 def install_python_dev_dependencies(bench_path=".", apps=None, verbose=False):
 	# REMOVE : debug logs
-	click.secho("\n--- `install_python_dev_dependencies` method Called ---\n",fg="blue",bold=True)
+	click.secho(
+		"\n--- `install_python_dev_dependencies` method Called ---\n", fg="blue", bold=True
+	)
 
 	import bench.cli
 	from bench.bench import Bench
@@ -88,17 +90,27 @@ def install_python_dev_dependencies(bench_path=".", apps=None, verbose=False):
 
 	bench = Bench(bench_path)
 
-	click.secho("\n--- `install_python_dev_dependencies` method Called after : Bench() ---\n",fg="yellow",bold=True)
-	click.secho(f"\n--- `install_python_dev_dependencies` method Called Apps : {app} ---\n",fg="green",bold=True)
-
+	click.secho(
+		"\n--- `install_python_dev_dependencies` method Called after : Bench() ---\n",
+		fg="yellow",
+		bold=True,
+	)
+	click.secho(
+		f"\n--- `install_python_dev_dependencies` method Called Apps : {apps} ---\n",
+		fg="green",
+		bold=True,
+	)
 
 	if isinstance(apps, str):
 		apps = [apps]
 	elif not apps:
 		apps = bench.get_installed_apps()
 
-	click.secho(f"\n--- `install_python_dev_dependencies` method Called Apps after : {app} ---\n",fg="green",bold=True)
-	
+	click.secho(
+		f"\n--- `install_python_dev_dependencies` method Called Apps after : {apps} ---\n",
+		fg="green",
+		bold=True,
+	)
 
 	for app in apps:
 		pyproject_deps = None
@@ -379,10 +391,12 @@ def restart_process_manager(bench_path=".", web_workers=False):
 
 
 def build_assets(bench_path=".", app=None, using_cached=False):
-	
+	click.secho(message="\n --- I am in Build assestes", fg="blue", bold=True)
 	command = "bench build"
 	if app:
 		command += f" --app {app}"
+
+	click.secho(f"\n --- Command : {command}", fg="blue", bold=True)
 
 	env = {"BENCH_DEVELOPER": "1"}
 	if using_cached:
