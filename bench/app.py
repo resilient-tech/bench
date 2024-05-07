@@ -421,6 +421,13 @@ class App(AppMeta):
 			remove_unused_node_modules(app_path)
 
 
+def add_to_appstxt(installed_apps, app, bench_path="."):
+	if app not in installed_apps:
+		installed_apps.append(app)
+		with open(os.path.join(bench_path, "sites", "apps.txt"), "w") as f:
+			f.write("\n".join(installed_apps))
+
+
 def coerce_url_to_name_if_possible(git_url: str, cache_key: str) -> str:
 	app_name = os.path.basename(git_url)
 	if can_get_cached(app_name, cache_key):
@@ -910,6 +917,8 @@ def install_app(
 		if verbose:
 			yarn_install += " --verbose"
 		bench.run(yarn_install, cwd=app_path)
+
+	add_to_appstxt(installed_apps=bench.apps.apps, app=app, bench_path=bench_path)
 
 	bench.apps.sync(app_name=app, required=resolution, branch=tag, app_dir=app_path)
 
